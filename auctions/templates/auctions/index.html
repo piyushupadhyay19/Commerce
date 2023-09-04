@@ -1,0 +1,41 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    {% if request.path == '/' %}
+        <h2>Active Listings</h2>
+    {% elif request.path == '/mylistings'%}
+        <h2>My Listings</h2>
+    {% else %}
+        <h2>Listings in {{category}} Category:</h2>
+    {% endif %}
+
+    {% if listings|length == 0 %}
+        <li>No listings found</li>
+    {% else %}
+      {% for listing in listings %}
+        <div class="card">
+            <div class="d-flex flex-row mb-2">
+                <div>
+                {% if listing.image_url %}
+                    <image src="{{ listing.image_url }}" class="rounded float-end" alt="{{listing.title}}">
+                {% endif %}
+                </div>
+                <div>
+                <h5 class="card-title">{{ listing.title }}</h5>
+                <p class="card-text">Description: {{ listing.description }}</p>
+                {% if listing.current_bid %}
+                <p class="card-text">Current Price: ₹ {{ listing.current_bid.bid }}</p>
+                {% else %}
+                <p class="card-text">Starting Price: ₹ {{ listing.starting_bid }}</p>
+                {% endif %}
+                <p class="card-text">Category: {{ listing.category }}</p>
+                <p class="card-text">Created by: {{ listing.user }}</p>
+                <p class="card-text">Created on: {{ listing.created_on }} IST</p>
+                <a href="{% url 'listing' listing.id %}" class="btn btn-primary">View Listing</a>
+                </div>
+            </div>
+        </div>
+      {% endfor %}
+    {% endif %}
+{% endblock %}

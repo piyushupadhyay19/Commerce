@@ -1,0 +1,90 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h2>{{listing.title}}</h2>
+
+        <div class="card">
+            <div class="card-body">
+                {% if listing.image_url %}
+                    <image src="{{ listing.image_url }}" class="img-thumbnail" alt="{{listing.title}}">
+                {% endif %}
+                    <p class="card-text">Description: {{ listing.description }}</p>
+                    <p class="card-text">Starting Price: ₹ {{ listing.starting_bid }}</p>
+                {% if listing.current_bid %}
+                    <p class="card-text">Current Bid: ₹ {{ listing.current_bid }}</p>
+                {% endif %}
+                    <p class="card-text">Category: {{ listing.category }}</p>
+                    <p class="card-text">Created by: {{ listing.user }}</p>
+                    <p class="card-text">Created on: {{ listing.created_on }} IST</p>
+                    {% if user.is_authenticated%}
+                    <form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    {% if listing in user.watchlist.all%}
+                    <input type="submit" name="watchlists" class="btn btn-secondary" value="Remove from watchlist" />
+                    {% else %}
+                    <input type="submit" name="watchlists" class="btn btn-success" value="Add to watchlist" />
+                    {% endif %}
+                    </form>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn btn-primary">Add to watchlist</a>
+                    {% endif %}
+                    {% if user.is_authenticated and listing.user == request.user and listing.active %}
+                    {% comment %} <button id="closeListingButton" class="btn btn-danger"><a href="{% url 'closelisting' listing.id %}">Close Listing</button> {% endcomment %}
+                    <button id="removeListingButton" class="btn btn-warning"><a href="{% url 'removelisting' listing.id %}">Remove Listing</a></button>
+                    {% endif %}
+                {% if user.is_authenticated and listing.user != request.user %}
+                    <form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %}
+                    {{ bid_form.as_p }}
+                    <input type="submit" name="newbid" value="Post Bid" onclick="return confirm('Are you sure you want to post this bid?');"/>
+                    </form>
+                {% endif %}
+                {% if user.is_authenticated %}
+                    <form action="{% url 'listing' listing.id %}" method="post">
+                    {% csrf_token %} {{ comment_form.as_p }}
+                    <input type="submit" name="commentss" value="Add Comment" />
+                    </form>
+                {% endif %}
+                {% if not listing.active %}
+                    <p class="card-text">This listing is closed</p>
+                    <p class="card-text">Winner: {{ listing.winner }}</p>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            {% if comments %}
+                <h5>Comments: </h5>
+            {% for comment in comments %}
+                <p> {{ comment.user }}: {{ comment.comment }} </p>
+            {% endfor %}
+            {% endif %}
+        </div>
+
+        <script>
+            if (document.getElementById("closeListingButton")){
+                document.getElementById("closeListingButton").addEventListener("click", function() {
+                const confirmClose = confirm("Are you sure you want to close this listing?\nClosing this listing will automatically make the highest bidder the winner of this listing.\nYou will not be able to undo this action.");    
+                if (confirmClose) {
+                    // User clicked "OK" (Yes), perform the action here
+                    window.location.href = "{% url 'listing' listing.id %}"; // Redirect to close_listing view
+                } else {
+                    // Do nothing
+                }
+            });
+        }
+
+            if (document.getElementById("removeListingButton")){
+                document.getElementById("removeListingButton").addEventListener("click", function() {
+                const confirmRemove = confirm("Are you sure you want to remove this listing?\nDoing so will permanently delete this listing and all associated data.\nYou will not be able to undo this action.");    
+                console.log("Remove listing");
+                if (confirmRemove) {
+                    // User clicked "OK" (Yes), perform the action here
+                    window.location.href = "{% url 'mylistings' %}";
+                } else {
+                    // Do nothing
+                }
+            });
+        }
+        </script>
+
+{% endblock %}

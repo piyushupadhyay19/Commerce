@@ -1,0 +1,22 @@
+{% extends 'auctions/layout.html' %} 
+
+{% block title %}
+    Categories
+{% endblock  %}
+
+{% block body %}
+
+
+    <h2>Categories</h2>
+    <ul>
+        {% if categories|length == 0 %}
+            <li>No categories found</li>
+        {% else %}
+        {% for category in categories %}
+            <li><a href="{% url 'category' category.category %}">{{ category.category }}</a></li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+{% endblock  %}
+
+{% comment %} Template filters are defined by using a pipe | character followed by the name of the filter. {% endcomment %}
