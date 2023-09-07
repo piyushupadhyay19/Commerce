@@ -12,7 +12,7 @@ from .forms import ListingForm, BidFrontendForm, CommentForm
 
 def index(request):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.all().order_by('title')
+        "listings": Listing.objects.filter(active=True).order_by('title')
         })
 
 
@@ -84,8 +84,11 @@ def create(request):
         })
 
 def listing(request, listing_id):
-    listing = Listing.objects.get(pk=listing_id)
-    comments = listing.comments.all()
+    try:
+        listing = Listing.objects.get(pk=listing_id)
+        comments = listing.comments.all()
+    except Listing.DoesNotExist:
+        return redirect('index')
     if request.method == "POST":
         if "newbid" in request.POST:
             bid_form = BidFrontendForm(request.POST or None, instance=Bid(listing=listing))
@@ -137,6 +140,11 @@ def mylisting(request):
         "listings": Listing.objects.filter(user=request.user).order_by('title')
     })
 
+def closedlistings(request):
+    return render(request, "auctions/index.html", {
+        "listings": Listing.objects.filter(active=False).order_by('title')
+    })
+
 def categories(request):
     return render(request, "auctions/category.html", {
         "categories": Category.objects.all()
@@ -144,7 +152,7 @@ def categories(request):
 
 def categorylisting(request, category):
     return render(request, "auctions/index.html", {
-        "listings": Listing.objects.filter(category__category=category).order_by('title'),
+        "listings": Listing.objects.filter(category__category=category, active=True).order_by('title'),
         "category": category,
     })
 
@@ -163,3 +171,24 @@ def removelisting(request, listing_id):
         return redirect('index')
 
     return redirect('mylistings')
+
+@login_required(login_url='/login')
+def closelisting(request, listing_id):
+    try:
+        listing = Listing.objects.get(id=listing_id)
+        if request.user == Listing.objects.get(pk=listing_id).user and Listing.objects.get(pk=listing_id).active and Listing.objects.get(pk=listing_id).current_bid is not None:
+            listing.active = False
+            listing.save()
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "comments": listing.comments.all(),
+                })
+        else:
+            return render(request, "auctions/listing.html", {
+                "listing": listing,
+                "comments": listing.comments.all(),
+                "comment_form": CommentForm(),
+                "error_message": "This listing has no bids yet. If you want to delete it, please choose to remove listing.",})
+    except Listing.DoesNotExist:
+        return redirect('index')
+

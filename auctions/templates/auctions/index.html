@@ -6,22 +6,24 @@
         <h2>Active Listings</h2>
     {% elif request.path == '/mylistings'%}
         <h2>My Listings</h2>
+    {% elif request.path == '/closedlistings'%}
+        <h2>Closed Listings</h2>
     {% else %}
-        <h2>Listings in {{category}} Category:</h2>
+        <h2>Active Listings in {{category}} Category:</h2>
     {% endif %}
 
     {% if listings|length == 0 %}
         <li>No listings found</li>
     {% else %}
       {% for listing in listings %}
-        <div class="card">
+        <div class="card mb-3">
             <div class="d-flex flex-row mb-2">
                 <div>
                 {% if listing.image_url %}
-                    <image src="{{ listing.image_url }}" class="rounded float-end" alt="{{listing.title}}">
+                    <image src="{{ listing.image_url }}" class="img-fluid" width="225" height="175" alt="{{listing.title}}">
                 {% endif %}
                 </div>
-                <div>
+                <div class="ml-1">
                 <h5 class="card-title">{{ listing.title }}</h5>
                 <p class="card-text">Description: {{ listing.description }}</p>
                 {% if listing.current_bid %}

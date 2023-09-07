@@ -5,9 +5,23 @@
 
         <div class="card">
             <div class="card-body">
-                {% if listing.image_url %}
-                    <image src="{{ listing.image_url }}" class="img-thumbnail" alt="{{listing.title}}">
+                {% if not listing.active and request.user == listing.current_bid.user %}
+                    <div class="alert alert-success" role="alert">
+                        <p>Congratulations! @{{listing.current_bid.user.username}} You won this listing!</p>
+                    </div>
                 {% endif %}
+                {% if error_message %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error_message }}
+                    </div>
+                {% endif %}
+                <div class="d-flex flex-row">
+                <div>
+                {% if listing.image_url %}
+                    <image src="{{ listing.image_url }}" class="img-fluid" width="400" height="350" alt="{{listing.title}}">
+                {% endif %}
+                </div>
+                <div>
                     <p class="card-text">Description: {{ listing.description }}</p>
                     <p class="card-text">Starting Price: ₹ {{ listing.starting_bid }}</p>
                 {% if listing.current_bid %}
@@ -16,6 +30,8 @@
                     <p class="card-text">Category: {{ listing.category }}</p>
                     <p class="card-text">Created by: {{ listing.user }}</p>
                     <p class="card-text">Created on: {{ listing.created_on }} IST</p>
+                </div>
+                </div>
                     {% if user.is_authenticated%}
                     <form action="{% url 'listing' listing.id %}" method="post">
                     {% csrf_token %}
@@ -29,25 +45,25 @@
                     <a href="{% url 'login' %}" class="btn btn-primary">Add to watchlist</a>
                     {% endif %}
                     {% if user.is_authenticated and listing.user == request.user and listing.active %}
-                    {% comment %} <button id="closeListingButton" class="btn btn-danger"><a href="{% url 'closelisting' listing.id %}">Close Listing</button> {% endcomment %}
-                    <button id="removeListingButton" class="btn btn-warning"><a href="{% url 'removelisting' listing.id %}">Remove Listing</a></button>
+                    <button id="closeListingButton" class="btn btn-danger mt-1">Close Listing</button>
+                    <button id="removeListingButton" class="btn btn-warning mt-1">Remove Listing</button>
                     {% endif %}
-                {% if user.is_authenticated and listing.user != request.user %}
+                {% if user.is_authenticated and listing.user != request.user and listing.active %}
                     <form action="{% url 'listing' listing.id %}" method="post">
                     {% csrf_token %}
                     {{ bid_form.as_p }}
                     <input type="submit" name="newbid" value="Post Bid" onclick="return confirm('Are you sure you want to post this bid?');"/>
                     </form>
                 {% endif %}
-                {% if user.is_authenticated %}
+                {% if user.is_authenticated and listing.active %}
                     <form action="{% url 'listing' listing.id %}" method="post">
                     {% csrf_token %} {{ comment_form.as_p }}
                     <input type="submit" name="commentss" value="Add Comment" />
                     </form>
                 {% endif %}
                 {% if not listing.active %}
-                    <p class="card-text">This listing is closed</p>
-                    <p class="card-text">Winner: {{ listing.winner }}</p>
+                    <p class="card-text text-danger">This listing is closed</p>
+                    <p class="card-text">Winner: <span class="badge badge-primary">{{ listing.current_bid.user }}</span></p>
                 {% endif %}
             </div>
         </div>
@@ -66,7 +82,7 @@
                 const confirmClose = confirm("Are you sure you want to close this listing?\nClosing this listing will automatically make the highest bidder the winner of this listing.\nYou will not be able to undo this action.");    
                 if (confirmClose) {
                     // User clicked "OK" (Yes), perform the action here
-                    window.location.href = "{% url 'listing' listing.id %}"; // Redirect to close_listing view
+                    window.location.href = "{% url 'closelisting' listing.id %}"; // Redirect to close_listing view
                 } else {
                     // Do nothing
                 }
@@ -79,7 +95,7 @@
                 console.log("Remove listing");
                 if (confirmRemove) {
                     // User clicked "OK" (Yes), perform the action here
-                    window.location.href = "{% url 'mylistings' %}";
+                    window.location.href = "{% url 'removelisting' listing.id %}";
                 } else {
                     // Do nothing
                 }

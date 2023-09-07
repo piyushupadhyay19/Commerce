@@ -14,8 +14,7 @@ class Listing(models.Model):
     description = models.TextField(blank=False)
     starting_bid = models.IntegerField(
         blank=False, validators=[MinValueValidator(1)])
-    # current_bid = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-    current_bid = models.ForeignKey('Bid', on_delete=models.CASCADE, null=True, blank=True, related_name="current_bid",)
+    current_bid = models.ForeignKey('Bid', on_delete=models.SET_NULL, null=True, blank=True, related_name="current_bid",)
     image_url = models.URLField(blank=True)
     category = models.ForeignKey(
         'Category', on_delete=models.SET_DEFAULT, default='NA', related_name="listings")
@@ -31,9 +30,9 @@ class Listing(models.Model):
 
 class Bid(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="bids", blank=False)
+        User, on_delete=models.SET_NULL, null=True, related_name="bids", blank=False)
     listing = models.ForeignKey(
-        Listing, on_delete=models.CASCADE, related_name="bids", blank=False)
+        Listing, on_delete=models.SET_NULL, null=True, related_name="bids", blank=False)
     bid = models.IntegerField(blank=False)
 
     def delete(self, *args, **kwargs):
@@ -45,7 +44,7 @@ class Bid(models.Model):
         super().delete(*args, **kwargs)
 
     def __str__(self):
-        return f"{self.user} - {self.listing} - {self.bid}"
+        return f"{self.bid} by {self.user}"
 
 
 class Comment(models.Model):
