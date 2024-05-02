@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.core.validators import MinValueValidator
@@ -23,6 +24,7 @@ class Listing(models.Model):
     active = models.BooleanField(default=True)
     watchlist = models.ManyToManyField(User, blank=True, related_name="watchlist")
     created_on = models.DateTimeField(auto_now_add=True)
+    # created_on = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
         return f"{self.title} - {self.starting_bid} - {self.category} - {self.user} - {self.active}"

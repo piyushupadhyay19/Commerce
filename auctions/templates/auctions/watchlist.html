@@ -8,12 +8,13 @@
 
 <h2>Items in your Watchlist:</h2>  
 
+{% if listings %}
 {% for listing in listings %}
         <div class="card">
             <div class="d-flex flex-row mb-2">
-                <div>
+                <div class="col-md-2">
                 {% if listing.image_url %}
-                    <image src="{{ listing.image_url }}" class="rounded float-end" alt="{{listing.title}}">
+                    <img src="{{ listing.image_url }}" class="img-fluid" alt="{{listing.title}}">
                 {% endif %}
                 </div>
                 <div>
@@ -32,5 +33,8 @@
             </div>
         </div>
     {% endfor %}
+    {% else %}
+    <li><strong style="color: red;">No items found in your watchlist.</strong></li>
+{% endif %}
 
 {% endblock  %}

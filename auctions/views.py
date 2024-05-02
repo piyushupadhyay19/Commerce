@@ -47,9 +47,17 @@ def register(request):
 
         password = request.POST["password"]
         confirmation = request.POST["confirmation"]
-        if password != confirmation:
+        if username.strip() == "" or email.strip() == "":
+            return render(request, "auctions/register.html", {
+                "message": "Please fill in all fields."
+            })
+        elif password != confirmation:
             return render(request, "auctions/register.html", {
                 "message": "Passwords must match."
+            })
+        elif len(password) < 8:
+            return render(request, "auctions/register.html", {
+                "message": "Password must be at least 8 characters long."
             })
 
         # Attempt to create new user

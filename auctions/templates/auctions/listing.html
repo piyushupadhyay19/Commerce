@@ -16,16 +16,16 @@
                     </div>
                 {% endif %}
                 <div class="d-flex flex-row">
-                <div>
+                <div class="col-md-2">
                 {% if listing.image_url %}
-                    <image src="{{ listing.image_url }}" class="img-fluid" width="400" height="350" alt="{{listing.title}}">
+                    <image src="{{ listing.image_url }}" class="img-fluid" alt="{{listing.title}}">
                 {% endif %}
                 </div>
                 <div>
                     <p class="card-text">Description: {{ listing.description }}</p>
                     <p class="card-text">Starting Price: ₹ {{ listing.starting_bid }}</p>
                 {% if listing.current_bid %}
-                    <p class="card-text">Current Bid: ₹ {{ listing.current_bid }}</p>
+                    <p class="card-text">Current Bid: <span class="badge badge-primary" style="font-size: 14px;">₹ {{ listing.current_bid }}</span></p>
                 {% endif %}
                     <p class="card-text">Category: {{ listing.category }}</p>
                     <p class="card-text">Created by: {{ listing.user }}</p>
@@ -63,7 +63,7 @@
                 {% endif %}
                 {% if not listing.active %}
                     <p class="card-text text-danger">This listing is closed</p>
-                    <p class="card-text">Winner: <span class="badge badge-primary">{{ listing.current_bid.user }}</span></p>
+                    <p class="card-text" style="font-size: 20px;">Winner: <span class="badge badge-primary">{{ listing.current_bid.user }}</span></p>
                 {% endif %}
             </div>
         </div>
@@ -71,7 +71,7 @@
             {% if comments %}
                 <h5>Comments: </h5>
             {% for comment in comments %}
-                <p> {{ comment.user }}: {{ comment.comment }} </p>
+                <p><strong> {{ comment.user }}</strong>: {{ comment.comment }} </p>
             {% endfor %}
             {% endif %}
         </div>

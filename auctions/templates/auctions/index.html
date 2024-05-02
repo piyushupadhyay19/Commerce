@@ -13,14 +13,14 @@
     {% endif %}
 
     {% if listings|length == 0 %}
-        <li>No listings found</li>
+        <li><strong style="color: red;">No listings found</strong></li>
     {% else %}
       {% for listing in listings %}
         <div class="card mb-3">
             <div class="d-flex flex-row mb-2">
-                <div>
+                <div class="col-md-2">
                 {% if listing.image_url %}
-                    <image src="{{ listing.image_url }}" class="img-fluid" width="225" height="175" alt="{{listing.title}}">
+                    <img src="{{ listing.image_url }}" class="card-img" alt="{{listing.title}}">
                 {% endif %}
                 </div>
                 <div class="ml-1">
